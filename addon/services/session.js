@@ -1,11 +1,13 @@
-import Ember from 'ember';
-const { next } = Ember.run;
+import Service from '@ember/service';
+import { inject } from '@ember/service';
+import { computed } from '@ember/object';
+import { next } from '@ember/runloop';
 
-export default Ember.Service.extend({
-  store: Ember.inject.service(),
-  settings: Ember.inject.service(),
-  security: Ember.inject.service(),
-  favorites: Ember.inject.service(),
+export default Service.extend({
+  store: inject(),
+  settings: inject(),
+  security: inject(),
+  //favorites: inject(),
 
   verifyInProgress: false,
 
@@ -36,7 +38,7 @@ export default Ember.Service.extend({
 
   getUrlParameterByName(name, url) {
     if (!url) url = window.location.href;
-    name = name.replace(/[\[\]]/g, '\\$&');
+    name = name.replace(/[[\]]/g, '\\$&');
     let regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
       results = regex.exec(url);
     if (!results) return null;
@@ -46,7 +48,7 @@ export default Ember.Service.extend({
 
   onVerificationSuccess() {
     this.get('security').refresh();
-    this.get('favorites').refresh();
+    //this.get('favorites').refresh();
   },
 
   update(sessionModel) {
@@ -153,7 +155,7 @@ export default Ember.Service.extend({
 
   realmId: null,
 
-  username: Ember.computed('settings', 'settings.username', {
+  username: computed('settings', 'settings.username', {
     get() {
       return this.get('settings.username')
     },
@@ -163,7 +165,7 @@ export default Ember.Service.extend({
     }
   }).volatile(),
 
-  token: Ember.computed('settings', 'settings.token', {
+  token: computed('settings', 'settings.token', {
     get() {
       return this.get('settings.token')
     },
@@ -173,7 +175,7 @@ export default Ember.Service.extend({
     }
   }).volatile(),
 
-  expires: Ember.computed('settings', 'settings.expires', {
+  expires: computed('settings', 'settings.expires', {
     get() {
       return this.get('settings.expires')
     },
@@ -183,7 +185,7 @@ export default Ember.Service.extend({
     }
   }).volatile(),
 
-  isLoggedIn: Ember.computed('username', 'token', 'expires', 'user', function() {
+  isLoggedIn: computed('username', 'token', 'expires', 'user', function() {
     let token = this.get('token'),
       expires = this.get('expires');
 

@@ -1,16 +1,19 @@
-import Ember from 'ember';
+import Service from '@ember/service';
 import RSVP from 'rsvp';
 import DS from 'ember-data';
+import { inject } from '@ember/service';
+import { computed } from '@ember/object';
+import Logger from 'ember';
 
-export default Ember.Service.extend({
-  session: Ember.inject.service(),
+export default Service.extend({
+  session: inject(),
 
-  store: Ember.inject.service(),
-  i18n: Ember.inject.service(),
-  localeFetcher: Ember.inject.service('i18n-fetch'),
+  store: inject(),
+  i18n: inject(),
+  localeFetcher: inject('i18n-fetch'),
 
   init: function() {
-    this._super.apply(this, arguments);
+    this._super(...arguments);
     this.get('i18n');
 
     this._onStorageEvent =  function (ea){
@@ -37,7 +40,7 @@ export default Ember.Service.extend({
   /**
    * The current app token
    */
-  token: Ember.computed({
+  token: computed({
     get() {
       return this.getLocally('token');
     },
@@ -51,7 +54,7 @@ export default Ember.Service.extend({
   /**
    * Time when the current token expires
    */
-  expires: Ember.computed({
+  expires: computed({
     get() {
       return this.getLocally('expires');
     },
@@ -65,7 +68,7 @@ export default Ember.Service.extend({
   /**
    * The current users username
    */
-  username: Ember.computed({
+  username: computed({
     get() {
       return this.getLocally('username');
     },
@@ -89,7 +92,7 @@ export default Ember.Service.extend({
   /**
    * Sets the current locale and loads it from server if necessary
    */
-  locale: Ember.computed({
+  locale: computed({
     get() {
       return this.getLocally('locale');
     },
@@ -300,19 +303,18 @@ export default Ember.Service.extend({
 
   setRemote: function(setting) {
     setting.save().then(function(){
-      Ember.Logger.warn('setting save ok');
+      Logger.warn('setting save ok');
     }, function() {
-      Ember.Logger.info('setting save fail');
+      Logger.info('setting save fail');
     });
 
     //return localStorage.setItem(localKey, value);
   },
 
   fetchAll: function(userId, realmId) {
-    let store = this.get('store'),
-      settings = null;
+    let store = this.get('store');
 
-    settings = store.query('setting', {
+    return store.query('setting', {
       user: userId,
       realm: realmId
     });

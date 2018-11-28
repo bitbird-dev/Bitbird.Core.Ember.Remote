@@ -1,6 +1,6 @@
 {
   "name": "bitbird-core-ember-remote",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon"
@@ -8,10 +8,12 @@
   "license": "MIT",
   "author": "Martin Liboswar",
   "directories": {
-    "doc": "doc",
     "test": "tests"
   },
-  "repository": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bitbird-dev/Bitbird.Core.Ember.Remote.git"
+  },
   "scripts": {
     "build": "ember build",
     "lint:js": "eslint ./*.js addon addon-test-support app config lib server test-support tests",
@@ -35,6 +37,7 @@
     "ember-cli-shims": "^1.2.0",
     "ember-cli-sri": "^2.1.0",
     "ember-cli-uglify": "^2.0.0",
+    "ember-data": "^3.5.0",
     "ember-disable-prototype-extensions": "^1.1.2",
     "ember-export-application-global": "^2.0.0",
     "ember-load-initializers": "^1.0.0",
@@ -52,5 +55,10 @@
   },
   "ember-addon": {
     "configPath": "tests/dummy/config"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/bitbird-dev/Bitbird.Core.Ember.Remote/issues"
+  },
+  "homepage": "https://github.com/bitbird-dev/Bitbird.Core.Ember.Remote#readme",
+  "main": "index.js"
 }

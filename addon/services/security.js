@@ -1,21 +1,24 @@
-import Ember from 'ember';
+import Service from '@ember/service';
+import { inject } from '@ember/service';
+import { computed } from '@ember/object';
+import { assert } from '@ember/debug';
 
-export default Ember.Service.extend({
-  store: Ember.inject.service('store'),
+export default Service.extend({
+  store: inject('store'),
 
-  rights: Ember.computed({
+  rights: computed({
     get(){
       return this.get('store').peekAll('right');
     }
   }),
 
-  rightKeys: Ember.computed('rights', function () {
+  rightKeys: computed('rights', function () {
     return this.get('rights').map(function(model) {
       return model.get('name');
     });
   }),
 
-  roles: Ember.computed({
+  roles: computed({
     get(){
       return this.get('store').peekAll('role');
     }
@@ -36,12 +39,12 @@ export default Ember.Service.extend({
   hasRights(params) {
     var hasRights = true;
     if (!params || params.length==0) {
-      Ember.assert('At least one rightKey is expected');
+      assert('At least one rightKey is expected');
       return hasRights;
     }
     var rights = this.get('rightKeys');
     if (!rights) {
-      Ember.assert('Security service must provide rightKeys');
+      assert('Security service must provide rightKeys');
       return hasRights;
     }
     params.forEach(function (arg){
@@ -59,12 +62,12 @@ export default Ember.Service.extend({
   hasAnyRight(params) {
     var hasRights = true;
     if (!params || params.length==0) {
-      Ember.assert('At least one rightKey is expected');
+      assert('At least one rightKey is expected');
       return hasRights;
     }
     var rights = this.get('rightKeys');
     if (!rights) {
-      Ember.assert('Security service must provide rightKeys');
+      assert('Security service must provide rightKeys');
       return hasRights;
     }
     hasRights = false;

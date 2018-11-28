@@ -1,10 +1,14 @@
-import Ember from 'ember';
+import Service from '@ember/service';
+import { inject } from '@ember/service';
+import { computed } from '@ember/object';
+import $ from 'jquery';
+import { getOwner } from '@ember/application';
 import RSVP from 'rsvp';
 import FileSaverMixin from 'ember-cli-file-saver/mixins/file-saver';
 
-export default Ember.Service.extend(FileSaverMixin, {
-  settings: Ember.inject.service(),
-  headers: Ember.computed({
+export default Service.extend(FileSaverMixin, {
+  settings: null,//inject(),
+  headers: computed({
     get() {
       let session = this.get('session'),
         token = session.get('token');
@@ -122,7 +126,7 @@ export default Ember.Service.extend(FileSaverMixin, {
 
   makeGet: function(path, success, fail, useJsonP, dataType) {
     let self = this,
-      env = Ember.getOwner(this).resolveRegistration('config:environment');
+      env = getOwner(this).resolveRegistration('config:environment');
 
     /**
      *
@@ -136,7 +140,7 @@ export default Ember.Service.extend(FileSaverMixin, {
 
     // use this transport for "binary" data type
     // move this to an initializer
-    Ember.$.ajaxTransport("+binary", function(options, originalOptions, jqXHR){
+    $.ajaxTransport("+binary", function(options, originalOptions, jqXHR){
       // check for conditions and support for blob / arraybuffer response type
       if (window.FormData && ((options.dataType && (options.dataType == 'binary')) || (options.data && ((window.ArrayBuffer && options.data instanceof ArrayBuffer) || (window.Blob && options.data instanceof Blob)))))
       {
@@ -251,12 +255,12 @@ export default Ember.Service.extend(FileSaverMixin, {
       ajaxConfig.jsonp = 'jsonp';
     }
 
-    Ember.$.ajax(ajaxConfig);
+    $.ajax(ajaxConfig);
   },
 
   makePost: function(path, payload, success, fail, useJsonP, dataType, resultDataType) {
     let self = this,
-      env = Ember.getOwner(this).resolveRegistration('config:environment');
+      env = getOwner(this).resolveRegistration('config:environment');
 
     /**
      *
@@ -270,7 +274,7 @@ export default Ember.Service.extend(FileSaverMixin, {
 
     // use this transport for "binary" data type
     // move this to an initializer
-    Ember.$.ajaxTransport("+binary", function(options, originalOptions, jqXHR){
+    $.ajaxTransport("+binary", function(options, originalOptions, jqXHR){
       // check for conditions and support for blob / arraybuffer response type
       if (window.FormData && ((options.dataType && (options.dataType == 'binary')) || (options.data && ((window.ArrayBuffer && options.data instanceof ArrayBuffer) || (window.Blob && options.data instanceof Blob)))))
       {
@@ -392,12 +396,12 @@ export default Ember.Service.extend(FileSaverMixin, {
       ajaxConfig.jsonp = 'jsonp';
     }
 
-    Ember.$.ajax(ajaxConfig);
+    $.ajax(ajaxConfig);
   },
 
   makeDelete: function(path, payload, success, fail, useJsonP, dataType) {
     let self = this,
-      env = Ember.getOwner(this).resolveRegistration('config:environment');
+      env = getOwner(this).resolveRegistration('config:environment');
 
     /**
      *
@@ -411,7 +415,7 @@ export default Ember.Service.extend(FileSaverMixin, {
 
     // use this transport for "binary" data type
     // move this to an initializer
-    Ember.$.ajaxTransport("+binary", function(options, originalOptions, jqXHR){
+    $.ajaxTransport("+binary", function(options, originalOptions, jqXHR){
       // check for conditions and support for blob / arraybuffer response type
       if (window.FormData && ((options.dataType && (options.dataType == 'binary')) || (options.data && ((window.ArrayBuffer && options.data instanceof ArrayBuffer) || (window.Blob && options.data instanceof Blob)))))
       {
@@ -520,6 +524,6 @@ export default Ember.Service.extend(FileSaverMixin, {
       ajaxConfig.jsonp = 'jsonp';
     }
 
-    Ember.$.ajax(ajaxConfig);
+    $.ajax(ajaxConfig);
   }
 });
