@@ -1,7 +1,7 @@
-import connection from "./../services/connection";
-import security from "./../services/security";
-import session from "./../services/session";
-import settings from "./../services/settings";
+import connection from "bitbird-core-ember-remote/services/connection";
+import security from "bitbird-core-ember-remote/services/security";
+import session from "bitbird-core-ember-remote/services/session";
+import settings from "bitbird-core-ember-remote/services/settings";
 
 export function initialize(application) {
   application.register('service:connection', connection, { singleton: true }); //instantiate: false

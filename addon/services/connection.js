@@ -7,7 +7,7 @@ import RSVP from 'rsvp';
 import FileSaverMixin from 'ember-cli-file-saver/mixins/file-saver';
 
 export default Service.extend(FileSaverMixin, {
-  settings: null,//inject(),
+  settings: inject(),
   headers: computed({
     get() {
       let session = this.get('session'),

@@ -2,12 +2,13 @@ import Service from '@ember/service';
 import { inject } from '@ember/service';
 import { computed } from '@ember/object';
 import { next } from '@ember/runloop';
+import Logger from 'ember';
 
 export default Service.extend({
   store: inject(),
   settings: inject(),
   security: inject(),
-  //favorites: inject(),
+  favorites: null,//inject(),
 
   verifyInProgress: false,
 
@@ -48,7 +49,8 @@ export default Service.extend({
 
   onVerificationSuccess() {
     this.get('security').refresh();
-    //this.get('favorites').refresh();
+    Logger.warn("Fix this: Favorites service is from another project!!!");
+    this.get('favorites').refresh();
   },
 
   update(sessionModel) {
