@@ -1,1 +1,1 @@
-export { default } from 'bitbird-core-ember-internationalization/services/security';
+export { default } from 'bitbird-core-ember-remote/services/security';
