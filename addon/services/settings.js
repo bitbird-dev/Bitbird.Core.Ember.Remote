@@ -9,8 +9,6 @@ export default Service.extend({
   session: inject(),
 
   store: inject(),
-  //i18n: inject(),
-  //localeFetcher: inject('i18n-fetch'),
 
   init: function() {
     this._super(...arguments);
@@ -18,7 +16,6 @@ export default Service.extend({
 
     this._onStorageEvent =  function (ea){
       if(ea && ea.key === 'session' && ea.oldValue !== ea.newValue) {
-        //this.notifyPropertyChange('locale');
         this.notifyPropertyChange('token');
         this.notifyPropertyChange('expires');
         this.notifyPropertyChange('username');
@@ -78,39 +75,6 @@ export default Service.extend({
       return value;
     }
   }),
-
-  /**
-   * Defines if the initial (~the first) locale loaded
-   */
-  //isInitialLocaleLoaded: false,
-
-  /**
-   * Defines if a new locale is currently being loaded
-   */
-  //isLocaleLoading: false,
-
-  /**
-   * Sets the current locale and loads it from server if necessary
-   */
-  /*locale: computed({
-    get() {
-      return this.getLocally('locale');
-    },
-    set(key, value) {
-      this.set('isLocaleLoading', true);
-
-      let self = this;
-      let fetch = this.get('localeFetcher').fetch(value);
-      fetch.then(function() {
-        self.set('i18n.locale', value);
-        self.setLocally('locale', value);
-        self.notifyPropertyChange('locale');
-        self.set('isLocaleLoading', false);
-        self.set('isInitialLocaleLoaded', true);
-      });
-      return fetch;
-    }
-  }),*/
 
   /**
    *  Reads a key-value-pair from the server where the value is a simple value

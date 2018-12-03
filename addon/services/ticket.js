@@ -1,7 +1,6 @@
 import Service from '@ember/service';
 import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
-import environment from 'bitbird-core-ember-remote/config/environment';
 
 export default Service.extend({
   ajax: service(),
@@ -30,6 +29,8 @@ export default Service.extend({
   ],
 
   _send(type, body) {
+    let environment = getOwner(this).resolveRegistration('config:environment');
+
     //Append Api Key
     let session = this.get('session');
     let token = session.get('token');
@@ -69,6 +70,8 @@ export default Service.extend({
   },
 
   _getSystemInfo() {
+    let environment = getOwner(this).resolveRegistration('config:environment');
+
     let systemInfo = "",
       ua = this.get('userAgent'),
       uaBi = ua.get('browser.info'),

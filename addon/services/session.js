@@ -8,7 +8,7 @@ export default Service.extend({
   store: inject(),
   settings: inject(),
   security: inject(),
-  favorites: null,//inject(),
+  //favorites: null,//inject(),
 
   verifyInProgress: false,
 
@@ -49,8 +49,8 @@ export default Service.extend({
 
   onVerificationSuccess() {
     this.get('security').refresh();
-    Logger.warn("Fix this: Favorites service is from another project!!!");
-    this.get('favorites').refresh();
+    //Logger.warn("Fix this: Favorites service is from another project!!!");
+    //this.get('favorites').refresh();
   },
 
   update(sessionModel) {
