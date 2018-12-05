@@ -75,7 +75,8 @@ export default Service.extend({
 
     let model = this.get('store').createRecord('session', {
       username: username,
-      password: password
+      password: password,
+      loginTokenExpires: new Date(2000,0,1)
     });
 
     let self = this;
