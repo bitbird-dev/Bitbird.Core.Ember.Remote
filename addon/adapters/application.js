@@ -1,21 +1,23 @@
 import Ember from 'ember';
 import DS from 'ember-data';
+import { inject as service } from '@ember/service';
+import { computed } from '@ember/object';
 import { getOwner } from '@ember/application';
 
 export default DS.JSONAPIAdapter.extend({
-  session: Ember.inject.service(),
-  connection: Ember.inject.service(),
-  environment: Ember.computed(function() {
+  session: service(),
+  connection: service(),
+  environment: computed(function() {
     return getOwner(this).resolveRegistration('config:environment');
   }),
 
-  host: Ember.computed('environment', function() {
+  host: computed('environment', function() {
     return this.get('environment.APP.API.HOST');
   }),
-  namespace: Ember.computed('environment', function() {
+  namespace: computed('environment', function() {
     return this.get('environment.APP.API.NAMESPACE');
   }),
-  headers: Ember.computed({
+  headers: computed({
     get() {
       return this.get('connection').get('headers');
     }

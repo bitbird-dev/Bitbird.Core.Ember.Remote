@@ -35,6 +35,20 @@ export default Service.extend({
   _hash: null,
 
   /**
+   * The current session id
+   */
+  session: computed({
+    get() {
+      return this.getLocally('session');
+    },
+    set(key, value) {
+      this.setLocally('session', value);
+      this.notifyPropertyChange('session');
+      return value;
+    }
+  }),
+
+  /**
    * The current app token
    */
   token: computed({

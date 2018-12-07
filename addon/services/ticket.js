@@ -1,6 +1,7 @@
 import Service from '@ember/service';
 import { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
+import { getOwner } from '@ember/application';
 
 export default Service.extend({
   ajax: service(),

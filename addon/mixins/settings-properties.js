@@ -1,13 +1,15 @@
 import Ember from 'ember';
 import Mixin from '@ember/object/mixin';
-const { RSVP: { Promise } } = Ember;
 import { assert } from '@ember/debug';
+import { inject as service } from '@ember/service';
+import { Promise } from 'rsvp';
+import { isArray } from '@ember/array';
 
 export default Mixin.create({
   /**
    * Injected Setting-Service
    */
-  settings: Ember.inject.service(),
+  settings: service(),
 
   /**
    * Sets up the mixin and all observers
@@ -17,7 +19,7 @@ export default Mixin.create({
 
     let settingProperties = this.get('settingProperties');
     if(!settingProperties) return;
-    if(!Ember.isArray(settingProperties)) {
+    if(!isArray(settingProperties)) {
       settingProperties = [settingProperties];
     }
 

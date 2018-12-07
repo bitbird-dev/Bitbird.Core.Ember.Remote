@@ -2,12 +2,13 @@ import Service from '@ember/service';
 import { inject } from '@ember/service';
 import { computed } from '@ember/object';
 import { next } from '@ember/runloop';
-import Logger from 'ember';
+//import Logger from 'ember';
 
 export default Service.extend({
   store: inject(),
   settings: inject(),
   security: inject(),
+  routing: inject('-routing'),
   //favorites: null,//inject(),
 
   verifyInProgress: false,
@@ -59,9 +60,10 @@ export default Service.extend({
       return;
     }
     this.setProperties({
+      session: sessionModel.get('id'),
       username: sessionModel.get('username'),
-      token: sessionModel.get('token'),
-      expires: sessionModel.get('tokenExpires'),
+      token: sessionModel.get('loginToken'),
+      expires: sessionModel.get('loginTokenExpires'),
       user: sessionModel.get('user')
     });
 
@@ -103,7 +105,7 @@ export default Service.extend({
 
     this.set('verifyInProgress', true);
 
-    this.get('store').findRecord('session', this.get('token'), { reload: true }).then(
+    this.get('store').findRecord('session', this.get('session'), { reload: true }).then(
       function(session) {
         self.update(session);
         self.set('verifyInProgress', false);
@@ -131,6 +133,7 @@ export default Service.extend({
     }
 
     sessions.forEach(function(session) {
+      //session.get('currentState.isLoading');
       session.deleteRecord();
       session.save().then(function(){
         self.clean();
@@ -142,6 +145,7 @@ export default Service.extend({
 
   clean() {
     this.setProperties({
+      session: null,
       username: null,
       token: null,
       expires: null
@@ -157,6 +161,16 @@ export default Service.extend({
   _onStorageEvent: null,
 
   realmId: null,
+
+  session: computed('settings', 'settings.session', {
+    get() {
+      return this.get('settings.session')
+    },
+    set(sender, value) {
+      this.set('settings.session', value);
+      this.notifyPropertyChange('session');
+    }
+  }).volatile(),
 
   username: computed('settings', 'settings.username', {
     get() {
@@ -188,11 +202,12 @@ export default Service.extend({
     }
   }).volatile(),
 
-  isLoggedIn: computed('username', 'token', 'expires', 'user', function() {
-    let token = this.get('token'),
+  isLoggedIn: computed('session', 'username', 'token', 'expires', 'user', function() {
+    let session = this.get('session'),
+      token = this.get('token'),
       expires = this.get('expires');
 
-    return !!token && !!expires && new Date(expires) >= new Date();
+    return !!session && !!token && !!expires && new Date(expires) >= new Date();
   }),
 
   user: null
