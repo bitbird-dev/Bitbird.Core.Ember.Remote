@@ -60,7 +60,7 @@ export default Service.extend({
       return;
     }
     this.setProperties({
-      session: sessionModel.get('id'),
+      sessionId: sessionModel.get('id'),
       username: sessionModel.get('username'),
       token: sessionModel.get('loginToken'),
       expires: sessionModel.get('loginTokenExpires'),
@@ -105,7 +105,7 @@ export default Service.extend({
 
     this.set('verifyInProgress', true);
 
-    this.get('store').findRecord('session', this.get('session'), { reload: true }).then(
+    this.get('store').findRecord('session', this.get('sessionId'), { reload: true }).then(
       function(session) {
         self.update(session);
         self.set('verifyInProgress', false);
@@ -145,7 +145,7 @@ export default Service.extend({
 
   clean() {
     this.setProperties({
-      session: null,
+      sessionId: null,
       username: null,
       token: null,
       expires: null
@@ -161,14 +161,13 @@ export default Service.extend({
   _onStorageEvent: null,
 
   realmId: null,
-
-  session: computed('settings', 'settings.session', {
+  sessionId: computed('settings', 'settings.sessionId', {
     get() {
-      return this.get('settings.session')
+      return this.get('settings.sessionId')
     },
     set(sender, value) {
-      this.set('settings.session', value);
-      this.notifyPropertyChange('session');
+      this.set('settings.sessionId', value);
+      this.notifyPropertyChange('sessionId');
     }
   }).volatile(),
 
@@ -202,12 +201,12 @@ export default Service.extend({
     }
   }).volatile(),
 
-  isLoggedIn: computed('session', 'username', 'token', 'expires', 'user', function() {
-    let session = this.get('session'),
+  isLoggedIn: computed('sessionId', 'username', 'token', 'expires', 'user', function() {
+    let sessionId = this.get('sessionId'),
       token = this.get('token'),
       expires = this.get('expires');
 
-    return !!session && !!token && !!expires && new Date(expires) >= new Date();
+    return !!sessionId && !!token && !!expires && new Date(expires) >= new Date();
   }),
 
   user: null

@@ -37,13 +37,13 @@ export default Service.extend({
   /**
    * The current session id
    */
-  session: computed({
+  sessionId: computed({
     get() {
-      return this.getLocally('session');
+      return this.getLocally('sessionId');
     },
     set(key, value) {
-      this.setLocally('session', value);
-      this.notifyPropertyChange('session');
+      this.setLocally('sessionId', value);
+      this.notifyPropertyChange('sessionId');
       return value;
     }
   }),
@@ -281,7 +281,7 @@ export default Service.extend({
 
   setRemote: function(setting) {
     setting.save().then(function(){
-      Logger.warn('setting save ok');
+      //Logger.warn('setting save ok', null);
     }, function() {
       Logger.info('setting save fail');
     });
