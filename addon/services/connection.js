@@ -202,7 +202,7 @@ export default Service.extend(FileSaverMixin, {
       useInternalHeaders = true;
     }
     // otherwise if the serviceUrl is internal, use internal headers
-    else if(serviceUrl.indexOf(internalBasePath) === 0) {
+    else if(serviceUrl.indexOf(env.APP.API.HOST) === 0) {
       useInternalHeaders = true;
     }
 
@@ -340,7 +340,7 @@ export default Service.extend(FileSaverMixin, {
       useInternalHeaders = true;
     }
     // otherwise if the serviceUrl is internal, use internal headers
-    else if(serviceUrl.indexOf(internalBasePath) === 0) {
+    else if(serviceUrl.indexOf(env.APP.API.HOST) === 0) {
       useInternalHeaders = true;
     }
 
@@ -470,7 +470,7 @@ export default Service.extend(FileSaverMixin, {
       useInternalHeaders = true;
     }
     // otherwise if the serviceUrl is internal, use internal headers
-    else if(serviceUrl.indexOf(internalBasePath) === 0) {
+    else if(serviceUrl.indexOf(env.APP.API.HOST) === 0) {
       useInternalHeaders = true;
     }
 
