@@ -202,8 +202,12 @@ export default Service.extend(FileSaverMixin, {
       useInternalHeaders = true;
     }
     // otherwise if the serviceUrl is internal, use internal headers
-    else if(serviceUrl.indexOf(env.APP.API.HOST) === 0) {
-      useInternalHeaders = true;
+    else
+    {
+      let serviceUrlObj = new URL(serviceUrl);
+      if(serviceUrlObj.origin.indexOf(env.APP.API.HOST) === 0 && serviceUrlObj.pathname.indexOf("/" + env.APP.API.NAMESPACE) == 0) {
+        useInternalHeaders = true;
+      }
     }
 
     let ajaxConfig = {
@@ -340,8 +344,11 @@ export default Service.extend(FileSaverMixin, {
       useInternalHeaders = true;
     }
     // otherwise if the serviceUrl is internal, use internal headers
-    else if(serviceUrl.indexOf(env.APP.API.HOST) === 0) {
-      useInternalHeaders = true;
+    else {
+      let serviceUrlObj = new URL(serviceUrl);
+      if(serviceUrlObj.origin.indexOf(env.APP.API.HOST) === 0 && serviceUrlObj.pathname.indexOf("/" + env.APP.API.NAMESPACE) == 0) {
+        useInternalHeaders = true;
+      }
     }
 
     let ajaxConfig = {
@@ -470,8 +477,11 @@ export default Service.extend(FileSaverMixin, {
       useInternalHeaders = true;
     }
     // otherwise if the serviceUrl is internal, use internal headers
-    else if(serviceUrl.indexOf(env.APP.API.HOST) === 0) {
-      useInternalHeaders = true;
+    else {
+      let serviceUrlObj = new URL(serviceUrl);
+      if(serviceUrlObj.origin.indexOf(env.APP.API.HOST) === 0 && serviceUrlObj.pathname.indexOf("/" + env.APP.API.NAMESPACE) == 0) {
+        useInternalHeaders = true;
+      }
     }
 
     let ajaxConfig = {
