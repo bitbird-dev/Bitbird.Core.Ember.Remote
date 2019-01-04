@@ -97,7 +97,8 @@ export default Service.extend({
 
   verify(onSuccess, onFail) {
     let self = this,
-      token = this.get('token');
+      token = this.get('token'),
+      sessionId = this.get('sessionId') || 'unset'; //backwards compatibility where sessionId was not used
 
     if(!token) {
       return this.logout();
@@ -105,7 +106,7 @@ export default Service.extend({
 
     this.set('verifyInProgress', true);
 
-    this.get('store').findRecord('session', this.get('sessionId'), { reload: true }).then(
+    this.get('store').findRecord('session', sessionId, { reload: true }).then(
       function(session) {
         self.update(session);
         self.set('verifyInProgress', false);
