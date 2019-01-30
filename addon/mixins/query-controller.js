@@ -1,6 +1,7 @@
 import Mixin from '@ember/object/mixin';
 import { inject } from '@ember/service';
 import { getOwner } from '@ember/application';
+import $ from 'jquery';
 
 export default Mixin.create({
   connection: inject(),
