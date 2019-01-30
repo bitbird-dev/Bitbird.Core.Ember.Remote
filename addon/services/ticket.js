@@ -55,7 +55,7 @@ export default Service.extend({
     let o = [];
 
     o.push({ "op": "add", "path": "/fields/System.Title", "value": title });
-    o.push({ "op": "add", "path": "/fields/System.AreaPath", "value": "Cleanbird\\Cleanbird Customer Team" });
+    o.push({ "op": "add", "path": "/fields/System.AreaPath", "value": "Cleanbird\\Cleanbird Software Team" });
 
     if(priority)
     {
