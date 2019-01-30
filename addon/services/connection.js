@@ -105,7 +105,10 @@ export default Service.extend(FileSaverMixin, {
         function() {
           //debugger;
           reject(new Error('makePromise failed'));
-        }, null, 'binary');
+        }, 
+        false,
+        null,
+        'binary');
     });
   },
 

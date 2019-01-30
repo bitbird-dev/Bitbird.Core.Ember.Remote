@@ -1,8 +1,9 @@
 import Mixin from '@ember/object/mixin';
 import { inject } from '@ember/service';
+import { getOwner } from '@ember/application';
 
 export default Mixin.create({
-  connection: inject('connection'),
+  connection: inject(),
   queryParams: ['page', 'size', 'sort', 'filter'],
   page: 0,
   size: 50,
@@ -66,7 +67,8 @@ export default Mixin.create({
   xlsxTable: function(except, path) {
     let conn = this.get('connection');
     // build url
-    let url = `${ENV.APP.API.HOST}/${ENV.APP.API.NAMESPACE}`;
+    let env = getOwner(this).resolveRegistration('config:environment');
+    let url = `${env.APP.API.HOST}/${env.APP.API.NAMESPACE}`;
     if(path.startsWith('/')) {
       url = url + path;
     } else {
@@ -106,8 +108,9 @@ export default Mixin.create({
    */
   headersToXlsxPayload: function(except){
     let x = { columns: [] };
+    let h = this.get('headers');
     // todo: null/undef/whatever check 
-    this.headers.forEach((h) => {if(except.indexOf(h.attributeName) < 0) x.columns.push({property: h.attributeName, caption: h.headerTitle });});
+    h.forEach((h) => {if(except.indexOf(h.attributeName) < 0) x.columns.push({property: h.attributeName, caption: h.headerTitle });});
     return x;
   },
 });
