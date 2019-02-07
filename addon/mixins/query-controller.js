@@ -76,7 +76,7 @@ export default Mixin.create({
             let currentPage = parseInt(this.get('page'),10);
             let newPage = currentPage + 1;
             // check for a max page
-            if(newPage < maxPages){
+            if(newPage < this.maxPages){
                 this.set('page', newPage);
             }
         }
