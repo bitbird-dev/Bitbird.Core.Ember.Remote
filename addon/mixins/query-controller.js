@@ -44,7 +44,7 @@ export default Mixin.create({
             let filterString = '';
             this.filterMap.set(attrName, {value: filterValue, type: filterType});
             this.filterMap.forEach((v,k)=>{
-                if(v !== null && v !== ''){
+                if(v !== null && v.value !== '' && v.value !== '*'){
                     if(v.type !== 'EXACT'){
                         filterString = filterString + `${k}=${v.type}(${v.value});`;
                     }
