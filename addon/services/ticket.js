@@ -45,7 +45,8 @@ export default Service.extend({
       {
         type: 'POST',
         headers: {
-          'X-ApiKey': token
+          'X-ApiKey': token,
+          'X-Application': environment.APP.API.IDENTIFIER
         },
         data: JSON.stringify(body)
       });

@@ -12,9 +12,12 @@ export default Service.extend(FileSaverMixin, {
   headers: computed({
     get() {
       let session = this.get('session'),
-        token = session.get('token');
+        token = session.get('token'),
+        env = getOwner(this).resolveRegistration('config:environment');
+
       return {
-        'X-ApiKey': token
+        'X-ApiKey': token,
+        'X-Application': env.APP.API.IDENTIFIER
       }
     }
   }).volatile(),

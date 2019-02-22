@@ -135,7 +135,6 @@ export default Service.extend({
         }
 
         sessions.forEach(function (session) {
-            //session.get('currentState.isLoading');
             session.deleteRecord();
             session.save().then(function () {
                 self.clean();
