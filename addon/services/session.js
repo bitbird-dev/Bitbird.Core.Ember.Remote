@@ -61,7 +61,8 @@ export default Service.extend({
             username: sessionModel.get('username'),
             token: sessionModel.get('loginToken'),
             expires: sessionModel.get('loginTokenExpires'),
-            user: sessionModel.get('user')
+            userId: sessionModel.belongsTo('user').id(),
+            user: sessionModel.get('user'),
         });
 
         this.notifyPropertyChange('isLoggedIn');
@@ -149,7 +150,9 @@ export default Service.extend({
             sessionId: null,
             username: null,
             token: null,
-            expires: null
+            expires: null,
+            user: null,
+            userId: null
         });
         try {
             this.get('store').unloadAll();
@@ -203,13 +206,15 @@ export default Service.extend({
         }
     }).volatile(),
 
-    isLoggedIn: computed('sessionId', 'username', 'token', 'expires', 'user', function () {
+    isLoggedIn: computed('sessionId', 'username', 'token', 'expires', 'userId', function () {
         let sessionId = this.get('sessionId'),
             token = this.get('token'),
-            expires = this.get('expires');
+            expires = this.get('expires'),
+          userId = this.get('userId');
 
-        return !!sessionId && !!token && !!expires && new Date(expires) >= new Date();
+        return !!userId && !!sessionId && !!token && !!expires && new Date(expires) >= new Date();
     }),
 
-    user: null
+    user: null,
+    userId: null
 });

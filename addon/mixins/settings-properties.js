@@ -2,8 +2,9 @@ import Ember from 'ember';
 import Mixin from '@ember/object/mixin';
 import { assert } from '@ember/debug';
 import { inject as service } from '@ember/service';
+import { observer } from '@ember/object';
+import { isArray} from '@ember/array';
 import { Promise } from 'rsvp';
-import { isArray } from '@ember/array';
 
 export default Mixin.create({
   /**
@@ -12,30 +13,35 @@ export default Mixin.create({
   settings: service(),
 
   /**
-   * Sets up the mixin and all observers
+   * Injected Session-Service
    */
-  init (){
-    this._super();
+  session: service(),
 
-    let settingProperties = this.get('settingProperties');
-    if(!settingProperties) return;
-    if(!isArray(settingProperties)) {
-      settingProperties = [settingProperties];
+  _setup: observer('session.isLoggedIn', function() {
+    if(this.get('session.isLoggedIn')) {
+      let settingProperties = this.get('settingProperties');
+      if(!settingProperties) return;
+
+      for(let valuePropertyName in settingProperties) {
+        if(!settingProperties.hasOwnProperty(valuePropertyName)) {
+          continue;
+        }
+
+        let keyPropertyName = valuePropertyName + "SettingKey";
+
+        //let valuePropertyName = keyPropertyName.substr(0, keyPropertyName.length - 10);
+
+        //Initially read the setting value
+        this.readSettingValue(valuePropertyName);
+
+        //Observe keyPropertyName and the value
+        //this.addObserver(keyPropertyName, this, this._handleSettingPropertyKeyChanged);
+        this.addObserver(valuePropertyName, this, '_handleSettingPropertyValueChanged');
+      }
+    } else {
+        //this.removeObserver(valuePropertyName, this, '_handleSettingPropertyValueChanged');
     }
-
-    settingProperties.forEach(function(keyPropertyName) {
-      assert("Names of SettingProperties must end with 'SettingKey'", keyPropertyName.endsWith('SettingKey'));
-
-      let valuePropertyName = keyPropertyName.substr(0, keyPropertyName.length - 10);
-
-      //Initially read the setting value
-      this.readSettingValue(valuePropertyName);
-
-      //Observe keyPropertyName and the value
-      this.addObserver(keyPropertyName, this, this._handleSettingPropertyKeyChanged);
-      this.addObserver(valuePropertyName, this, this._handleSettingPropertyValueChanged);
-    }, this);
-  },
+  }).on('init'),
 
   /**
    * A List of property names that provide the key for the property to be saved.
@@ -51,14 +57,12 @@ export default Mixin.create({
    */
   readSettingValue(valuePropertyName) {
     let self = this,
-      settingKey = this.get(valuePropertyName + 'SettingKey'),
-      defaultValuePropertyName = valuePropertyName + 'SettingDefaultValue';
+      settingKey = this._getSettingKey(valuePropertyName),
+      defaultValue = this._getSettingDefaultValue(valuePropertyName);
 
     if(!settingKey) {
       return new Promise(function(resolve, reject) { reject(); });
     }
-
-    let defaultValue = this.get(defaultValuePropertyName);
 
     let settingValue = this.get('settings').readUserValue(settingKey, defaultValue);
     if(this.get(valuePropertyName) === undefined)
@@ -81,7 +85,7 @@ export default Mixin.create({
    * @private
    */
   _writeSettingValue(valuePropertyName) {
-    let settingKey = this.get(valuePropertyName + 'SettingKey');
+    let settingKey = this._getSettingKey(valuePropertyName);
 
     if(!settingKey) return;
 
@@ -90,11 +94,30 @@ export default Mixin.create({
     this.get('settings').writeUserValue(settingKey, value);
   },
 
-  _handleSettingPropertyKeyChanged (sender, key) {
-    this.readSettingValue(key.substr(0, key.length - 10));
+  _getSettingKey(valuePropertyName) {
+    let settings = this.get('settingProperties')[valuePropertyName];
+    return settings.key || valuePropertyName;
   },
 
+  _getSettingDefaultValue(valuePropertyName) {
+    let settings = this.get('settingProperties')[valuePropertyName];
+    return settings.defaultValue || null;
+  },
+
+  /*_handleSettingPropertyKeyChanged (sender, key) {
+    this.readSettingValue(key.substr(0, key.length - 10));
+  },*/
+
   _handleSettingPropertyValueChanged (sender, key) {
+    if(isArray(this.get(key))) {
+      this.addObserver(`${key}.@each`, this, '_handleSettingPropertyArrayValueChanged');
+    }
+    this._writeSettingValue(key);
+  },
+
+  _handleSettingPropertyArrayValueChanged (sender, key) {
+    key = key.substr(0, key.length-6);
+    debugger;
     this._writeSettingValue(key);
   }
 });

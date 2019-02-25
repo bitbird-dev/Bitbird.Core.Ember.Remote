@@ -8,6 +8,9 @@ export default Service.extend({
   userAgent: service('userAgent'),
   appVersion: service('appVersion'),
   session: service('session'),
+  environment: computed(function() {
+    return getOwner(this).resolveRegistration('config:environment');
+  }),
 
   types: [
     { key: 'Bug', value: 'Bug' },
@@ -30,7 +33,7 @@ export default Service.extend({
   ],
 
   _send(type, body) {
-    let environment = getOwner(this).resolveRegistration('config:environment');
+    let environment = this.get('environment');
 
     //Append Api Key
     let session = this.get('session');
@@ -53,10 +56,11 @@ export default Service.extend({
   },
 
   _getBodyBase(title, description, priority) {
-    let o = [];
+    let o = [],
+    areaPath = this.get('environment.ticket.devOpsArea') || 'UNKNOWN';
 
     o.push({ "op": "add", "path": "/fields/System.Title", "value": title });
-    o.push({ "op": "add", "path": "/fields/System.AreaPath", "value": "Cleanbird\\Software" });
+    o.push({ "op": "add", "path": "/fields/System.AreaPath", "value": areaPath });
 
     if(priority)
     {

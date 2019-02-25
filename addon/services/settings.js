@@ -135,8 +135,8 @@ export default Service.extend({
 
     let setting = store.queryRecord('setting', {
       key: key,
-      user: user.get('id'),
-      realm: null
+      userId: user.get('id'),
+      realmId: null
     });
 
     let object = {
@@ -157,6 +157,14 @@ export default Service.extend({
             user: user
           });
         }
+        self.setRemote(setting);
+      }, function() {
+        debugger;
+        setting = self.get('store').createRecord('setting', {
+          key: key,
+          object: object,
+          user: user
+        });
         self.setRemote(setting);
       });
     } else {
@@ -210,8 +218,8 @@ export default Service.extend({
 
     let setting = store.queryRecord('setting', {
       key: key,
-      user: user.get('id'),
-      realm: null
+      userId: user.get('id'),
+      realmId: null
     });
 
     if(setting) {
@@ -252,8 +260,8 @@ export default Service.extend({
     {
       setting = store.queryRecord('setting', {
         key: key,
-        user: userId,
-        realm: realmId
+        userId: userId,
+        realmId: realmId
       });
     }
 
@@ -269,7 +277,7 @@ export default Service.extend({
             key: key,
             userId: userId,
             realmId: realmId,
-            value: value
+            valueId: value
           })
         }
         resolve(setting);
