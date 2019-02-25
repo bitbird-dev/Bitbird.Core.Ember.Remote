@@ -18,30 +18,52 @@ export default Mixin.create({
   session: service(),
 
   _setup: observer('session.isLoggedIn', function() {
-    if(this.get('session.isLoggedIn')) {
-      let settingProperties = this.get('settingProperties');
-      if(!settingProperties) return;
+    let settingProperties = this.get('settingProperties');
+    if(!settingProperties) return;
 
+    if(this.get('session.isLoggedIn')) {
       for(let valuePropertyName in settingProperties) {
         if(!settingProperties.hasOwnProperty(valuePropertyName)) {
           continue;
         }
-
-        let keyPropertyName = valuePropertyName + "SettingKey";
-
-        //let valuePropertyName = keyPropertyName.substr(0, keyPropertyName.length - 10);
-
         //Initially read the setting value
-        this.readSettingValue(valuePropertyName);
+        let setting = this.readSettingValue(valuePropertyName),
+          self = this,
+          settingLoaded = this.get('settingLoaded');
+
+        if(typeof settingLoaded === 'function' && setting.then) {
+          setting.then(function(result) {
+              settingLoaded.call(self, valuePropertyName, result);
+          }, function(result) {
+              settingLoaded.call(self, valuePropertyName, result);
+          });
+        } else {
+          settingLoaded.call(self, valuePropertyName);
+        }
 
         //Observe keyPropertyName and the value
         //this.addObserver(keyPropertyName, this, this._handleSettingPropertyKeyChanged);
         this.addObserver(valuePropertyName, this, '_handleSettingPropertyValueChanged');
       }
     } else {
-        //this.removeObserver(valuePropertyName, this, '_handleSettingPropertyValueChanged');
+      for(let valuePropertyName in settingProperties) {
+        if(!settingProperties.hasOwnProperty(valuePropertyName)) {
+          continue;
+        }
+
+        //Observe keyPropertyName and the value
+        //this.addObserver(keyPropertyName, this, this._handleSettingPropertyKeyChanged);
+        this.removeObserver(valuePropertyName, this, '_handleSettingPropertyValueChanged');
+      }
     }
   }).on('init'),
+
+  /**
+   * A hook you can use to get notified as soon a setting has been loaded from the server or failed to load.
+   * @param setting A string containing the setting property name
+   * @param result An object with additional info
+   */
+  settingLoaded:(setting, result) => {},
 
   /**
    * A List of property names that provide the key for the property to be saved.
@@ -71,8 +93,8 @@ export default Mixin.create({
     }
     if(settingValue && settingValue.then)
     {
-      settingValue.then(function(value) {
-        self.set(valuePropertyName, value);
+      settingValue.then(function(obj) {
+        self.set(valuePropertyName, obj.value);
       });
       return settingValue;
     }

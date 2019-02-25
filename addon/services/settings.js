@@ -105,16 +105,29 @@ export default Service.extend({
     let promise = new RSVP.Promise(
       function(resolve, reject) {
         let getPromise = self.getRemote(key, userId);
-        if(!getPromise) return reject(defaultValue);
+        if(!getPromise) return reject({
+          isError: false,
+          defaultValue: defaultValue,
+          errors: null
+        });
 
         getPromise.then(function(f) {
           let value = f.get('object.value');
           if(value === undefined) {
             value = defaultValue;
           }
-          resolve(value);
-        }, function() {
-          reject(defaultValue);
+          resolve({
+            isError: false,
+            value: value,
+            defaultValue: defaultValue,
+            errors: null
+          });
+        }, function(errors) {
+          reject({
+            isError: true,
+            defaultValue: defaultValue,
+            errors: errors
+          });
         });
       });
 

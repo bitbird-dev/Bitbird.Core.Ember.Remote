@@ -1,5 +1,4 @@
-import Service from '@ember/service';
-import { inject } from '@ember/service';
+import Service, { inject as service } from '@ember/service';
 import { computed } from '@ember/object';
 import $ from 'jquery';
 import { getOwner } from '@ember/application';
@@ -7,8 +6,8 @@ import RSVP from 'rsvp';
 import FileSaverMixin from 'ember-cli-file-saver/mixins/file-saver';
 
 export default Service.extend(FileSaverMixin, {
-  settings: inject(),
-  session: inject(),
+  settings: service(),
+  session: service(),
   headers: computed({
     get() {
       let session = this.get('session'),
@@ -108,7 +107,7 @@ export default Service.extend(FileSaverMixin, {
         function() {
           //debugger;
           reject(new Error('makePromise failed'));
-        }, 
+        },
         false,
         null,
         'binary');
