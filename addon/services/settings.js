@@ -172,7 +172,6 @@ export default Service.extend({
         }
         self.setRemote(setting);
       }, function() {
-        debugger;
         setting = self.get('store').createRecord('setting', {
           key: key,
           object: object,

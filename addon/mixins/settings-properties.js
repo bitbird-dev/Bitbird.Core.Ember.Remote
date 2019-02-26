@@ -139,7 +139,6 @@ export default Mixin.create({
 
   _handleSettingPropertyArrayValueChanged (sender, key) {
     key = key.substr(0, key.length-6);
-    debugger;
     this._writeSettingValue(key);
   }
 });
