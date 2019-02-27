@@ -96,7 +96,7 @@ export default Service.extend({
    * @param defaultValue
    * @returns {*}
    */
-  readUserValue(key, defaultValue) {
+  readUserValue(key, defaultValue, type) {
     let self = this,
       userId = this.get('session').get('user.id');
 
@@ -115,6 +115,17 @@ export default Service.extend({
           let value = f.get('object.value');
           if(value === undefined) {
             value = defaultValue;
+          }
+
+          if(type)
+          {
+            switch(type) {
+              case 'date':
+                value = new Date(value);
+                break;
+              default:
+                break;
+            }
           }
           resolve({
             isError: false,
