@@ -96,6 +96,11 @@ export default Mixin.create({
     {
       settingValue.then(function(obj) {
         self.set(valuePropertyName, obj.value);
+      }, function(obj) {
+        if(obj.defaultValue !== undefined)
+        {
+          self.set(valuePropertyName, obj.defaultValue);
+        }
       });
       return settingValue;
     }
