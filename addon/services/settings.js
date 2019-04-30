@@ -97,7 +97,7 @@ export default Service.extend({
    * @param defaultValue
    * @returns {*}
    */
-  readUserValue(key, defaultValue) {
+  readUserValue(key, defaultValue, type) {
     let self = this,
       userId = this.get("session").get("user.id");
 
@@ -117,6 +117,17 @@ export default Service.extend({
           let value = f.get("object.value");
           if (value === undefined) {
             value = defaultValue;
+          }
+
+          if(type)
+          {
+            switch(type) {
+              case 'date':
+                value = new Date(value);
+                break;
+              default:
+                break;
+            }
           }
           resolve({
             isError: false,
@@ -187,7 +198,15 @@ export default Service.extend({
           });
           self.setRemote(setting);
         }
-      );
+        self.setRemote(setting);
+      }, function() {
+        setting = self.get('store').createRecord('setting', {
+          key: key,
+          object: object,
+          user: user
+        });
+        self.setRemote(setting);
+      });
     } else {
       setting = this.get("store").createRecord("setting", {
         key: key,

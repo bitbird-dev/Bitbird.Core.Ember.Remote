@@ -80,13 +80,14 @@ export default Mixin.create({
   readSettingValue(valuePropertyName) {
     let self = this,
       settingKey = this._getSettingKey(valuePropertyName),
-      defaultValue = this._getSettingDefaultValue(valuePropertyName);
+      defaultValue = this._getSettingDefaultValue(valuePropertyName),
+      type = this._getSettingTypeValue(valuePropertyName);
 
     if(!settingKey) {
       return new Promise(function(resolve, reject) { reject(); });
     }
 
-    let settingValue = this.get('settings').readUserValue(settingKey, defaultValue);
+    let settingValue = this.get('settings').readUserValue(settingKey, defaultValue, type);
     if(this.get(valuePropertyName) === undefined)
     {
       self.set(valuePropertyName, defaultValue);
@@ -95,6 +96,11 @@ export default Mixin.create({
     {
       settingValue.then(function(obj) {
         self.set(valuePropertyName, obj.value);
+      }, function(obj) {
+        if(obj.defaultValue !== undefined)
+        {
+          self.set(valuePropertyName, obj.defaultValue);
+        }
       });
       return settingValue;
     }
@@ -126,6 +132,11 @@ export default Mixin.create({
     return settings.defaultValue || null;
   },
 
+  _getSettingTypeValue(valuePropertyName) {
+    let settings = this.get('settingProperties')[valuePropertyName];
+    return settings.type || null;
+  },
+
   /*_handleSettingPropertyKeyChanged (sender, key) {
     this.readSettingValue(key.substr(0, key.length - 10));
   },*/
@@ -139,7 +150,6 @@ export default Mixin.create({
 
   _handleSettingPropertyArrayValueChanged (sender, key) {
     key = key.substr(0, key.length-6);
-    debugger;
     this._writeSettingValue(key);
   }
 });
