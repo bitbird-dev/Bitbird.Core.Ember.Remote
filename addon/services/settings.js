@@ -1,9 +1,10 @@
-import Service from '@ember/service';
-import RSVP from 'rsvp';
-import DS from 'ember-data';
-import { inject } from '@ember/service';
-import { computed } from '@ember/object';
-import Logger from 'ember';
+import Service from "@ember/service";
+import RSVP from "rsvp";
+import DS from "ember-data";
+import { inject } from "@ember/service";
+import { computed, get } from "@ember/object";
+import { isBlank } from "@ember/utils";
+import Logger from "ember";
 
 export default Service.extend({
   session: inject(),
@@ -14,11 +15,11 @@ export default Service.extend({
     this._super(...arguments);
     //this.get('i18n');
 
-    this._onStorageEvent =  function (ea){
-      if(ea && ea.key === 'session' && ea.oldValue !== ea.newValue) {
-        this.notifyPropertyChange('token');
-        this.notifyPropertyChange('expires');
-        this.notifyPropertyChange('username');
+    this._onStorageEvent = function(ea) {
+      if (ea && ea.key === "session" && ea.oldValue !== ea.newValue) {
+        this.notifyPropertyChange("token");
+        this.notifyPropertyChange("expires");
+        this.notifyPropertyChange("username");
       }
     };
 
@@ -39,13 +40,13 @@ export default Service.extend({
    */
   sessionId: computed({
     get() {
-      return this.getLocally('sessionId');
+      return this.getLocally("sessionId");
     },
     set(key, value) {
-      this.setLocally('sessionId', value);
-      this.notifyPropertyChange('sessionId');
+      this.setLocally("sessionId", value);
+      this.notifyPropertyChange("sessionId");
       return value;
-    }
+    },
   }),
 
   /**
@@ -53,13 +54,13 @@ export default Service.extend({
    */
   token: computed({
     get() {
-      return this.getLocally('token');
+      return this.getLocally("token");
     },
     set(key, value) {
-      this.setLocally('token', value);
-      this.notifyPropertyChange('token');
+      this.setLocally("token", value);
+      this.notifyPropertyChange("token");
       return value;
-    }
+    },
   }),
 
   /**
@@ -67,13 +68,13 @@ export default Service.extend({
    */
   expires: computed({
     get() {
-      return this.getLocally('expires');
+      return this.getLocally("expires");
     },
     set(key, value) {
-      this.setLocally('expires', value);
-      this.notifyPropertyChange('expires');
+      this.setLocally("expires", value);
+      this.notifyPropertyChange("expires");
       return value;
-    }
+    },
   }),
 
   /**
@@ -81,13 +82,13 @@ export default Service.extend({
    */
   username: computed({
     get() {
-      return this.getLocally('username');
+      return this.getLocally("username");
     },
     set(key, value) {
-      this.setLocally('username', value);
-      this.notifyPropertyChange('username');
+      this.setLocally("username", value);
+      this.notifyPropertyChange("username");
       return value;
-    }
+    },
   }),
 
   /**
@@ -98,41 +99,44 @@ export default Service.extend({
    */
   readUserValue(key, defaultValue) {
     let self = this,
-      userId = this.get('session').get('user.id');
+      userId = this.get("session").get("user.id");
 
-    if(!userId) return null;
+    if (!userId) return null;
 
-    let promise = new RSVP.Promise(
-      function(resolve, reject) {
-        let getPromise = self.getRemote(key, userId);
-        if(!getPromise) return reject({
+    let promise = new RSVP.Promise(function(resolve, reject) {
+      let getPromise = self.getRemote(key, userId);
+      if (!getPromise)
+        return reject({
           isError: false,
           defaultValue: defaultValue,
-          errors: null
+          errors: null,
         });
 
-        getPromise.then(function(f) {
-          let value = f.get('object.value');
-          if(value === undefined) {
+      getPromise.then(
+        function(f) {
+          let value = f.get("object.value");
+          if (value === undefined) {
             value = defaultValue;
           }
           resolve({
             isError: false,
             value: value,
             defaultValue: defaultValue,
-            errors: null
+            errors: null,
           });
-        }, function(errors) {
+        },
+        function(errors) {
           reject({
             isError: true,
             defaultValue: defaultValue,
-            errors: errors
+            errors: errors,
           });
-        });
-      });
+        }
+      );
+    });
 
     return DS.PromiseObject.create({
-      promise: promise
+      promise: promise,
     });
   },
 
@@ -143,48 +147,52 @@ export default Service.extend({
    */
   writeUserValue(key, value) {
     let self = this,
-      store = this.get('store'),
-      user = this.get('session.user');
-
-    let setting = store.queryRecord('setting', {
+      store = this.get("store"),
+      user = this.get("session.user");
+    if (!user) {
+      return;
+    }
+    if (isBlank(get(user, "id"))) {
+      return;
+    }
+    let setting = store.queryRecord("setting", {
       key: key,
-      userId: user.get('id'),
-      realmId: null
+      userId: user.get("id"),
+      realmId: null,
     });
 
     let object = {
-      value: value
+      value: value,
     };
 
-    if(setting) {
-      setting.then(function(setting) {
-        if(setting)
-        {
-          setting.set('object', object);
-        }
-        else
-        {
-          setting = self.get('store').createRecord('setting', {
+    if (setting) {
+      setting.then(
+        function(setting) {
+          if (setting) {
+            setting.set("object", object);
+          } else {
+            setting = self.get("store").createRecord("setting", {
+              key: key,
+              object: object,
+              user: user,
+            });
+          }
+          self.setRemote(setting);
+        },
+        function() {
+          setting = self.get("store").createRecord("setting", {
             key: key,
             object: object,
-            user: user
+            user: user,
           });
+          self.setRemote(setting);
         }
-        self.setRemote(setting);
-      }, function() {
-        debugger;
-        setting = self.get('store').createRecord('setting', {
-          key: key,
-          object: object,
-          user: user
-        });
-        self.setRemote(setting);
-      });
+      );
     } else {
-      setting = this.get('store').createRecord('setting', {
+      setting = this.get("store").createRecord("setting", {
         key: key,
         object: object,
-        user: user
+        user: user,
       });
       this.setRemote(setting);
     }
@@ -198,25 +206,27 @@ export default Service.extend({
    */
   readUserObject(key, defaultObject) {
     let self = this,
-      userId = this.get('session.user.id');
+      userId = this.get("session.user.id");
 
-    if(!userId) return null;
+    if (!userId) return null;
 
-    return new RSVP.Promise(
-      function(resolve, reject) {
-        let getPromise = self.getRemote(key, userId);
-        if(!getPromise) return defaultObject;
+    return new RSVP.Promise(function(resolve, reject) {
+      let getPromise = self.getRemote(key, userId);
+      if (!getPromise) return defaultObject;
 
-        getPromise.then(function(f) {
-          let object = f.get('object');
-          if(object === undefined) {
+      getPromise.then(
+        function(f) {
+          let object = f.get("object");
+          if (object === undefined) {
             object = defaultObject;
           }
           resolve(object);
-        }, function() {
+        },
+        function() {
           reject(defaultObject);
-        });
-      });
+        }
+      );
+    });
   },
 
   /**
@@ -226,101 +236,120 @@ export default Service.extend({
    */
   writeUserObject(key, object) {
     let self = this,
-      store = this.get('store'),
-      user = this.get('session.user');
+      store = this.get("store"),
+      user = this.get("session.user");
+    if (!user) {
+      return;
+    }
+    if (isBlank(get(user, "id"))) {
+      return;
+    }
 
-    let setting = store.queryRecord('setting', {
+    let setting = store.queryRecord("setting", {
       key: key,
-      userId: user.get('id'),
-      realmId: null
+      userId: user.get("id"),
+      realmId: null,
     });
 
-    if(setting) {
+    if (setting) {
       setting.then(function(setting) {
-        setting.set('object', object);
+        setting.set("object", object);
         self.setRemote(setting);
       });
     } else {
-      setting = this.get('store').createRecord('setting', {
+      setting = this.get("store").createRecord("setting", {
         key: key,
         object: object,
-        user: user
+        user: user,
       });
       this.setRemote(setting);
     }
   },
 
   getRemote: function(key, userId, realmId, value) {
-    let store = this.get('store'),
+    let store = this.get("store"),
       setting = null;
 
     //search locally
-    let settings = store.peekAll('setting');
-    for(let idx = 0, max = settings.get('length'); idx < max; idx++) {
+    let settings = store.peekAll("setting");
+    for (let idx = 0, max = settings.get("length"); idx < max; idx++) {
       let current = settings.objectAt(idx);
 
-      let currentUserId = current.get('userId') || null,
-        currentRealmId = current.get('realmId') || null,
-        currentKey = current.get('key') || null;
+      let currentUserId = current.get("userId") || null,
+        currentRealmId = current.get("realmId") || null,
+        currentKey = current.get("key") || null;
 
-      if(currentKey === key && (userId === undefined || currentUserId === null || currentUserId === userId) && (realmId === undefined || currentRealmId === null || currentRealmId === realmId)) {
+      if (
+        currentKey === key &&
+        (userId === undefined ||
+          currentUserId === null ||
+          currentUserId === userId) &&
+        (realmId === undefined ||
+          currentRealmId === null ||
+          currentRealmId === realmId)
+      ) {
         setting = current;
         break;
       }
     }
 
-    if(!setting)
-    {
-      setting = store.queryRecord('setting', {
+    if (!setting) {
+      setting = store.queryRecord("setting", {
         key: key,
         userId: userId,
-        realmId: realmId
+        realmId: realmId,
       });
     }
 
     return new RSVP.Promise(function(resolve, reject) {
-      if(!setting.then) {
+      if (!setting.then) {
         resolve(setting);
         return;
       }
 
-      setting.then(function(setting) {
-        if(!setting) {
-          setting = store.createRecord('setting', {
-            key: key,
-            userId: userId,
-            realmId: realmId,
-            valueId: value
-          })
+      setting.then(
+        function(setting) {
+          if (!setting) {
+            setting = store.createRecord("setting", {
+              key: key,
+              userId: userId,
+              realmId: realmId,
+              valueId: value,
+            });
+          }
+          resolve(setting);
+        },
+        function() {
+          reject(new Error("settings.getRemote failed."));
         }
-        resolve(setting);
-      }, function() {
-        reject(new Error('settings.getRemote failed.'));
-      })
+      );
     });
   },
 
   setRemote: function(setting) {
-    setting.save().then(function(){
-      //Logger.warn('setting save ok', null);
-    }, function() {
-      Logger.info('setting save fail');
-    });
+    setting.save().then(
+      function() {
+        //Logger.warn('setting save ok', null);
+      },
+      function() {
+        Logger.info("setting save fail");
+      }
+    );
 
     //return localStorage.setItem(localKey, value);
   },
 
   fetchAll: function(userId, realmId) {
-    let store = this.get('store');
+    let store = this.get("store");
 
-    return store.query('setting', {
+    return store.query("setting", {
       user: userId,
-      realm: realmId
+      realm: realmId,
     });
   },
 
   getLocally: function(key) {
-    if(!this._hash) {
+    if (!this._hash) {
       this.loadSettings();
     }
 
@@ -328,7 +357,7 @@ export default Service.extend({
   },
 
   setLocally: function(key, value) {
-    if(!this._hash) {
+    if (!this._hash) {
       this.loadSettings();
     }
 
@@ -344,24 +373,24 @@ export default Service.extend({
      }
      hash[prop] = null;
      }*/
-    localStorage.setItem('settings', JSON.stringify(hash));
+    localStorage.setItem("settings", JSON.stringify(hash));
     this._hash = hash;
   },
 
   saveSettings: function() {
-    if(!this._hash) {
+    if (!this._hash) {
       this.createSettings();
     } else {
-      localStorage.setItem('settings', JSON.stringify(this._hash));
+      localStorage.setItem("settings", JSON.stringify(this._hash));
     }
   },
 
   loadSettings: function() {
-    let localStorageItem = localStorage.getItem('settings');
-    if(!localStorageItem) {
+    let localStorageItem = localStorage.getItem("settings");
+    if (!localStorageItem) {
       this.createSettings();
     } else {
       this._hash = JSON.parse(localStorageItem);
     }
-  }
+  },
 });
