@@ -1,6 +1,7 @@
 {
   "name": "bitbird-core-ember-remote",
-  "version": "1.0.32",  "description": "The default blueprint for ember-cli addons.",
+  "version": "1.0.33",
+  "description": "The default blueprint for ember-cli addons.",
   "keywords": [
     "ember-addon"
   ],

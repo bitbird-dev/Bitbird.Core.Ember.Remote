@@ -119,10 +119,9 @@ export default Service.extend({
             value = defaultValue;
           }
 
-          if(type)
-          {
-            switch(type) {
-              case 'date':
+          if (type) {
+            switch (type) {
+              case "date":
                 value = new Date(value);
                 break;
               default:
@@ -198,15 +197,7 @@ export default Service.extend({
           });
           self.setRemote(setting);
         }
-        self.setRemote(setting);
-      }, function() {
-        setting = self.get('store').createRecord('setting', {
-          key: key,
-          object: object,
-          user: user
-        });
-        self.setRemote(setting);
-      });
+      );
     } else {
       setting = this.get("store").createRecord("setting", {
         key: key,
