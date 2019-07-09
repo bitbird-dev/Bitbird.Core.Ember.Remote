@@ -4,6 +4,7 @@ import DS from "ember-data";
 import { inject } from "@ember/service";
 import { computed, get } from "@ember/object";
 import { isBlank } from "@ember/utils";
+import { debounce } from '@ember/runloop';
 import Logger from "ember";
 
 export default Service.extend({
@@ -29,6 +30,11 @@ export default Service.extend({
       window.attachEvent("onstorage", this._onStorageEvent);
     }
   },
+
+  /**
+   * Debouncing time to wait to write the setting to the server
+   */
+  writeWaitTime: 500,
 
   /**
    * Internal hash that holds the settings
@@ -151,11 +157,20 @@ export default Service.extend({
   },
 
   /**
-   * Writes a key-value-pair on the server where the value is a simple value
+   * Writes a key-value-pair on the server where the value is a simple value (debounced)
    * @param key
    * @param value
    */
   writeUserValue(key, value) {
+    debounce(this, this.writeUserValueImmediate, key, value , this.get('writeWaitTime') || 500);
+  },
+
+  /**
+   * Immediately writes a key-value-pair on the server where the value is a simple value
+   * @param key
+   * @param value
+   */
+  writeUserValueImmediate(key, value) {
     let self = this,
       store = this.get("store"),
       user = this.get("session.user");
