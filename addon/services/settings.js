@@ -162,8 +162,26 @@ export default Service.extend({
    * @param value
    */
   writeUserValue(key, value) {
-    debounce(this, this.writeUserValueImmediate, key, value , this.get('writeWaitTime') || 500);
+    //Create a delegate function to always use
+    let delegate = this._settings_delegates[key];
+    if(!delegate) {
+      delegate = this._settings_delegates[key] = function() {
+        let _key = key,
+          _value = this._settings_delegates[_key]._latestValue;
+        delete this._settings_delegates[_key];
+        this.writeUserValueImmediate(_key, _value);
+      };
+    }
+
+    this._settings_delegates[key]._latestValue = value;
+
+    debounce(this, delegate, this.get('writeWaitTime') || 500);
   },
+
+  /**
+   * Delegates for debouncing calls
+   */
+  _settings_delegates: {},
 
   /**
    * Immediately writes a key-value-pair on the server where the value is a simple value
@@ -171,6 +189,8 @@ export default Service.extend({
    * @param value
    */
   writeUserValueImmediate(key, value) {
+    console.log(`### WRITE ${key}=${value}`);
+
     let self = this,
       store = this.get("store"),
       user = this.get("session.user");
