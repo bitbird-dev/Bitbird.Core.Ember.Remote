@@ -189,8 +189,6 @@ export default Service.extend({
    * @param value
    */
   writeUserValueImmediate(key, value) {
-    console.log(`### WRITE ${key}=${value}`);
-
     let self = this,
       store = this.get("store"),
       user = this.get("session.user");
